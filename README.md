@@ -282,6 +282,19 @@ Rename via `OPLOG_METRICS_NAME` / `CURRENTOP_METRICS_NAME`.
 
 The metric registry **resets after each scrape**, so counters behave like window counters between scrapes.
 
+### Sample `/metrics` output (currentOp)
+
+With default `CURRENTOP_IGNORE_KEYVALUE=[]`, system ops such as **`hello`** and the exporter’s own **`currentOp`** appear in the scrape (often under `ns="admin.cmd"` / `admin.cmd.aggregate`). Use the [recommended filters](#tip-filter-system-noise-in-production) in production if you want to drop them.
+
+```text
+# HELP log_to_metric_mongo_currentop log_to_metric_mongo_currentop
+# TYPE log_to_metric_mongo_currentop counter
+log_to_metric_mongo_currentop{type="op",host="644eefa4f855_27017",desc="conn53",connectionId="53",clientip="172.17.0.1",client="172.17.0.1_46010",active="true",effectiveUsers="[user_exporter,db_admin]",opid="187254",secs_running="0",microsecs_running="131",op="command",ns="admin.cmd.aggregate",command="currentOp_1,lsid_id_...,db_admin"} 1
+log_to_metric_mongo_currentop{type="op",host="644eefa4f855_27017",desc="conn51",connectionId="51",clientip="172.17.0.1",client="172.17.0.1_45992",active="true",opid="187391",secs_running="9",microsecs_running="9430152",op="command",ns="admin.cmd",command="hello_1,maxAwaitTimeMS_10000,...,db_admin",waitingForLatch="timestamp_...,captureName_AnonymousLatch"} 1
+```
+
+Typical labels: `ns`, `op`, `command`, `secs_running` / `microsecs_running`, `client` / `clientip`, `appName`, `planSummary`, `effectiveUsers`.
+
 ## Project layout
 
 ```

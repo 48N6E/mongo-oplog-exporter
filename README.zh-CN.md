@@ -104,6 +104,19 @@ CURRENTOP_IGNORE_KEYVALUE=[{"command":"hello"},{"command":"currentOp"},{"command
 
 详见 [docs/KUBERNETES.zh-CN.md — CURRENTOP_IGNORE_KEYVALUE](docs/KUBERNETES.zh-CN.md#currentop_ignore_keyvalue-过滤规则)。
 
+## 指标样例
+
+默认不过滤时，`GET /metrics` 中可能出现系统操作（`hello`、exporter 自身的 `currentOp` 等，常见 `ns=admin.cmd`）：
+
+```text
+# HELP log_to_metric_mongo_currentop log_to_metric_mongo_currentop
+# TYPE log_to_metric_mongo_currentop counter
+log_to_metric_mongo_currentop{type="op",host="644eefa4f855_27017",desc="conn53",connectionId="53",clientip="172.17.0.1",client="172.17.0.1_46010",active="true",effectiveUsers="[user_exporter,db_admin]",opid="187254",secs_running="0",microsecs_running="131",op="command",ns="admin.cmd.aggregate",command="currentOp_1,lsid_id_...,db_admin"} 1
+log_to_metric_mongo_currentop{type="op",host="644eefa4f855_27017",desc="conn51",connectionId="51",clientip="172.17.0.1",client="172.17.0.1_45992",active="true",opid="187391",secs_running="9",microsecs_running="9430152",op="command",ns="admin.cmd",command="hello_1,maxAwaitTimeMS_10000,...,db_admin",waitingForLatch="timestamp_...,captureName_AnonymousLatch"} 1
+```
+
+完整说明与生产过滤建议见 [English README — Metrics](README.md#metrics)。
+
 ## License
 
 [GPL-3.0](LICENSE)
