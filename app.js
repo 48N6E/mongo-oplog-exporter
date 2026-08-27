@@ -21,26 +21,12 @@ app.use(metricsRoutes);
 app.listen(port);
 console.log(`HTTP server listening on 0.0.0.0:${port}`);
 
-// Oplog represents an individual document from the oplog.rs collection
-class Oplog {
-    constructor(document) {
-        this.timestamp = document.ts;
-        this.historyID = document.h;
-        this.mongoVersion = document.v;
-        this.operation = document.op;
-        this.namespace = document.ns;
-        this.object = document.o;
-        this.queryObject = document.o2;
-    }
-}
-
 async function latestOplog(db) {
-    const document = await db.collection('oplog.rs')
+    return db.collection('oplog.rs')
         .find({})
         .sort({ $natural: -1 })
         .limit(1)
         .next();
-    return new Oplog(document);
 }
 
 async function main() {
@@ -55,9 +41,9 @@ async function main() {
             await client.connect();
             console.log("Connected to MongoDB for oplog tailing");
             const db = client.db('local');
-            const lo = await latestOplog(db);
+            const latestDoc = await latestOplog(db);
             const currentTimestamp = Math.floor(Date.now() / 1000);
-            const newTimestamp = new Timestamp({ t: currentTimestamp, i: 1 });
+            const newTimestamp = latestDoc?.ts ?? new Timestamp({ t: currentTimestamp, i: 1 });
 
             const cursor = db.collection('oplog.rs').find(
                { ts: { $gte: newTimestamp }},
@@ -70,6 +56,9 @@ async function main() {
             ).stream();
 
             cursor.on('data', (doc) => {
+                if (!doc) {
+                    return;
+                }
                 doc['exporter_type'] = "oplog";
                 metricsController.postMetrics(doc);
                 if (openlog_oplog === "true") {
