@@ -265,7 +265,8 @@ The metric registry **resets after each scrape**, so counters behave like window
 
 ```
 ├── app.js                      # Entry: MongoDB collectors + HTTP server
-├── config.example.json           # Copy to config.json for local runs (gitignored)
+├── config.json                 # Default config (override via env vars in production)
+├── config.example.json
 ├── .github/workflows/docker-publish.yml
 ├── docker-compose.yml
 ├── .env.example
