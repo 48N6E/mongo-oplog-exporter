@@ -26,6 +26,8 @@ Prometheus exporter that tails MongoDB **oplog** and polls **currentOp**, exposi
 
 Full guide: **[docs/KUBERNETES.md](docs/KUBERNETES.md)** · **[docs/KUBERNETES.zh-CN.md](docs/KUBERNETES.zh-CN.md)** (use cases, every env var & label, PromQL alerts)
 
+Grafana dashboard example (screenshots + importable JSON): **[docs/grafana/README.md](docs/grafana/README.md)**
+
 ## Quick start
 
 ### Prerequisites
@@ -97,14 +99,22 @@ Metrics: `http://0.0.0.0:7777/metrics`
 
 ### Docker Run
 
+Pull from Docker Hub:
+
 ```bash
-docker build -t mongo-oplog-exporter:latest .
+docker pull 48n6e/mongo-oplog-exporter:latest
+```
+
+Or build locally:
+
+```bash
+docker build -t 48n6e/mongo-oplog-exporter:latest .
 
 docker run -d \
   --name mongo-oplog-exporter \
   --restart unless-stopped \
   -p 7777:7777 \
-  -e MONGO_URL="mongodb://exporter:change-me@192.168.1.10:27017/?authSource=admin" \
+  -e MONGO_URL="mongodb://exporter:change-me@mongodb-host:27017/?authSource=admin" \
   -e MONGO_DIRECT_CONNECTION="true" \
   -e PORT="7777" \
   -e OPEN_OPLOG="true" \
@@ -118,7 +128,7 @@ docker run -d \
   -e CURRENTOP_METRICS_NAME="log_to_metric_mongo_currentop" \
   --memory=1000m \
   --cpus=1 \
-  mongo-oplog-exporter:latest \
+  48n6e/mongo-oplog-exporter:latest \
   node --trace-warnings --gc-interval=1000 --max-old-space-size=2048 app.js
 
 curl http://localhost:7777/metrics
@@ -151,7 +161,7 @@ Typical pattern: run the exporter as a **sidecar** per MongoDB pod, with per-nod
 
 ```yaml
 - name: mongo-oplog-exporter
-  image: mongo-oplog-exporter:latest
+  image: 48n6e/mongo-oplog-exporter:latest
   env:
     - name: MONGO_URL
       valueFrom:
@@ -255,13 +265,13 @@ The metric registry **resets after each scrape**, so counters behave like window
 
 ```
 ├── app.js                      # Entry: MongoDB collectors + HTTP server
-├── config.json                 # Runtime defaults (no secrets in Git)
-├── config.example.json
+├── config.example.json           # Copy to config.json for local runs (gitignored)
 ├── .github/workflows/docker-publish.yml
 ├── docker-compose.yml
 ├── .env.example
 ├── scripts/create-exporter-user.sh
 ├── docs/
+│   ├── grafana/              # Grafana dashboard JSON + screenshots
 │   ├── KUBERNETES.zh-CN.md   # K8s 字段说明 + 使用场景 + 告警示例
 │   └── KUBERNETES.md
 ├── deploy/

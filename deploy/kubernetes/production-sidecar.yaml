@@ -1,4 +1,4 @@
-# Production sidecar — based on real MongoDB cluster deployment
+# Production sidecar example
 # One exporter per MongoDB Pod; PORT increments per node (5000, 5001, ...)
 #
 # Helm / templating example:

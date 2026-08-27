@@ -25,6 +25,8 @@ Prometheus exporter：采集 MongoDB **oplog** 与 **currentOp**，暴露为 Pro
 
 详见 **[docs/KUBERNETES.zh-CN.md](docs/KUBERNETES.zh-CN.md)**（含 example.yaml 逐字段说明、全部 label 含义、PromQL 告警示例）
 
+Grafana 面板示例（截图 + 可导入 JSON）：**[docs/grafana/README.md](docs/grafana/README.md)**
+
 ## 快速开始
 
 ### 前置要求

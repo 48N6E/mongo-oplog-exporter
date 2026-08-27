@@ -4,6 +4,7 @@ yarn-debug.log*
 yarn-error.log*
 
 # Local configuration (copy from config.example.json)
+config.json
 config.local.json
 .env
 

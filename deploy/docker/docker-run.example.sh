@@ -2,7 +2,7 @@
 # docker run example — production params aligned with Kubernetes sidecar deploy
 #
 # Usage:
-#   MONGO_URL='mongodb://exporter:pass@192.168.1.10:27017/?authSource=admin' \
+#   MONGO_URL='mongodb://exporter:change-me@mongodb-host:27017/?authSource=admin' \
 #   ./deploy/docker/docker-run.example.sh
 
 set -e
