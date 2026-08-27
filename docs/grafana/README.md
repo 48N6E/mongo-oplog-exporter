@@ -40,9 +40,9 @@ TOP5 慢查询明细，以及全表扫描 / 非全表扫描慢查询时序图。
 
 慢查询相关面板依赖独立的慢日志指标；若环境中未部署对应采集器，可删除或禁用「慢查询」分组下的面板。
 
-## 与 exporter 默认过滤一致
+## 过滤提示
 
-currentOp 表格标题中的「排除 admin, local, hello」与 exporter 默认 `CURRENTOP_IGNORE_KEYVALUE` 一致：**`admin.$cmd`** 等 `admin.*` 不会出现在 currentOp 指标中（`ns` 子串匹配 `admin`）。oplog 面板不受此规则影响。说明见 [README — admin.$cmd](../../README.md#default-filtering-admincmd-and-system-noise)（中文：[README.zh-CN](../../README.zh-CN.md#默认过滤admincmd-与系统噪声)）。
+exporter 默认 **不**过滤 currentOp 中的系统操作（`admin.$cmd` 等也会出现）。面板标题里的「排除 admin, local, hello」表示 Grafana 侧展示意图，或你在生产环境按推荐配置了 `CURRENTOP_IGNORE_KEYVALUE` 之后的效果。说明见 [README — 提示：过滤系统噪声](../../README.md#tip-filter-system-noise-in-production)（中文：[README.zh-CN](../../README.zh-CN.md#提示生产环境建议过滤系统噪声)）。
 
 ## 隐私说明
 

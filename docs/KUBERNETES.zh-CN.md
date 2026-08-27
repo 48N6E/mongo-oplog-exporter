@@ -217,6 +217,8 @@ currentOp `inprog[]` 中每条操作 → Prometheus label，用于 **`log_to_met
 
 ### CURRENTOP_IGNORE_KEYVALUE 过滤规则
 
+**默认值为 `[]`（不过滤）**，系统命令也会进入指标。生产环境建议按下面配置过滤噪声。
+
 | 条件 | 过滤原因 |
 |------|----------|
 | `{"command":"hello"}` | 驱动心跳 |
@@ -226,9 +228,15 @@ currentOp `inprog[]` 中每条操作 → Prometheus label，用于 **`log_to_met
 | `{"appName":"QAN"}` | Percona QAN 监控 |
 | `{"ns":"admin"}` / `{"ns":"local"}` | 系统库内部操作（含 `admin.$cmd`、`local.*`） |
 
-默认会过滤 `admin.$cmd`：规则为 `ns` 字段**包含** `"admin"` 即丢弃整条 currentOp（子串匹配，不是精确相等）。
+`{"ns":"admin"}` 对 `ns` 做**子串匹配**（不是精确相等），因此也会匹配 `admin.$cmd`。
 
-若需要监控 `admin.$cmd`，从 `CURRENTOP_IGNORE_KEYVALUE` 中删除 `{"ns":"admin"}`，保留其余项即可。oplog 侧无按 `ns` 过滤，见 [README — admin.$cmd 说明](../README.md#default-filtering-admincmd-and-system-noise)。
+推荐生产配置示例：
+
+```bash
+CURRENTOP_IGNORE_KEYVALUE=[{"command":"hello"},{"command":"currentOp"},{"command":"isMaster"},{"appName":"OplogFetcher"},{"ns":"admin"},{"ns":"local"},{"appName":"QAN"}]
+```
+
+详见 [README — 提示：过滤系统噪声](../README.md#tip-filter-system-noise-in-production)。
 
 ---
 

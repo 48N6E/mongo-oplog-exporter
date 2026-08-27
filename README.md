@@ -233,23 +233,30 @@ Production deployments should inject all settings via env vars.
 |----------|-------------|
 | `CURRENTOP_IGNORE_OP` | Ignored op types |
 | `CURRENTOP_IGNORE_FIELD` | Stripped fields (`locks`, `lockStats`, …) |
-| `CURRENTOP_IGNORE_KEYVALUE` | Filter by key-value (hello, QAN, …) |
+| `CURRENTOP_IGNORE_KEYVALUE` | Filter by key-value; **default `[]`** (tip: filter hello / admin.$cmd in production) |
 | `CURRENTOP_METRICS_TYPE` | `counter` or `gauge` |
 | `CURRENTOP_METRICS_NAME` | Metric name (default: `log_to_metric_mongo_currentop`) |
 | `CURRENTOP_INIT_LABEL` | Pre-declared counter labels |
 | `CURRENTOP_VALUE_LENGTH` | Max label value length |
 
-### Default filtering: `admin.$cmd` and system noise
+### Tip: filter system noise in production
 
-**currentOp** (default): `CURRENTOP_IGNORE_KEYVALUE` includes `{"ns":"admin"}`. Matching uses **substring** on the `ns` label, so **`admin.$cmd`** and other `admin.*` namespaces are **not exported** to `log_to_metric_mongo_currentop`. This reduces noise from internal commands (`hello`, replication, etc. are filtered separately). **`local`** is filtered the same way.
+**Default:** `CURRENTOP_IGNORE_KEYVALUE=[]` — system ops such as **`admin.$cmd`**, `hello`, and `local.*` **are exported**. Matching is substring-based when you do set filters (e.g. `{"ns":"admin"}` also matches `admin.$cmd`).
 
-**oplog** (default): only `OPLOG_IGNORE_OP=["n"]` — **no** `ns` filter. Writes to `admin.$cmd` still appear in `log_to_metric_mongo_oplog` if present in `local.oplog.rs`.
-
-To **include** `admin` / `admin.$cmd` in currentOp metrics, remove `{"ns":"admin"}` from `CURRENTOP_IGNORE_KEYVALUE`, for example:
+**Recommendation:** on busy clusters, set filters to cut heartbeat / replication / system-namespace noise and keep Prometheus cardinality under control:
 
 ```bash
--e 'CURRENTOP_IGNORE_KEYVALUE=[{"command":"hello"},{"command":"currentOp"},{"command":"isMaster"},{"appName":"OplogFetcher"},{"ns":"local"},{"appName":"QAN"}]'
+-e 'CURRENTOP_IGNORE_KEYVALUE=[{"command":"hello"},{"command":"currentOp"},{"command":"isMaster"},{"appName":"OplogFetcher"},{"ns":"admin"},{"ns":"local"},{"appName":"QAN"}]'
 ```
+
+| Filter | Why |
+|--------|-----|
+| `{"command":"hello"}` / `{"command":"isMaster"}` | Driver heartbeats / topology checks |
+| `{"command":"currentOp"}` | Exporter's own poll |
+| `{"appName":"OplogFetcher"}` / `{"appName":"QAN"}` | Replication / QAN agent |
+| `{"ns":"admin"}` / `{"ns":"local"}` | System DB ops including `admin.$cmd` |
+
+**oplog** still only ignores `op=n` by default (no `ns` filter).
 
 See [docs/KUBERNETES.md](docs/KUBERNETES.md) for the full filter table.
 

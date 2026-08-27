@@ -217,6 +217,8 @@ Each entry in currentOp `inprog[]` → labels on **`log_to_metric_mongo_currento
 
 ### CURRENTOP_IGNORE_KEYVALUE rules
 
+**Default is `[]` (no key-value filtering)** — system ops are exported. For production, apply the filters below to reduce noise.
+
 | Filter | Reason |
 |--------|--------|
 | `{"command":"hello"}` | Driver heartbeat |
@@ -226,7 +228,15 @@ Each entry in currentOp `inprog[]` → labels on **`log_to_metric_mongo_currento
 | `{"appName":"QAN"}` | Percona QAN agent |
 | `{"ns":"admin"}` / `{"ns":"local"}` | System database internals (`admin.$cmd`, `local.*`) |
 
-By default **`admin.$cmd` is excluded** from currentOp metrics: `{"ns":"admin"}` uses **substring** matching on the `ns` label (not exact equality). To include `admin` / `admin.$cmd`, remove `{"ns":"admin"}` from `CURRENTOP_IGNORE_KEYVALUE`. Oplog has no `ns` filter — see [README — admin.$cmd](../README.md#default-filtering-admincmd-and-system-noise).
+`{"ns":"admin"}` uses **substring** matching on `ns` (not exact equality), so it also matches `admin.$cmd`.
+
+Recommended production example:
+
+```bash
+CURRENTOP_IGNORE_KEYVALUE=[{"command":"hello"},{"command":"currentOp"},{"command":"isMaster"},{"appName":"OplogFetcher"},{"ns":"admin"},{"ns":"local"},{"appName":"QAN"}]
+```
+
+See [README — tip: filter system noise](../README.md#tip-filter-system-noise-in-production).
 
 ---
 

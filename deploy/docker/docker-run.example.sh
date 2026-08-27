@@ -1,6 +1,9 @@
 #!/bin/sh
 # docker run example — production params aligned with Kubernetes sidecar deploy
 #
+# Tip: CURRENTOP_IGNORE_KEYVALUE defaults to []. In production, filter system noise, e.g.:
+#   CURRENTOP_IGNORE_KEYVALUE='[{"command":"hello"},{"command":"currentOp"},{"command":"isMaster"},{"appName":"OplogFetcher"},{"ns":"admin"},{"ns":"local"},{"appName":"QAN"}]'
+#
 # Usage:
 #   MONGO_URL='mongodb://exporter:change-me@mongodb-host:27017/?authSource=admin' \
 #   ./deploy/docker/docker-run.example.sh
@@ -34,7 +37,7 @@ docker run -d \
   -e CURRENTOP_METRICS_NAME="${CURRENTOP_METRICS_NAME:-log_to_metric_mongo_currentop}" \
   -e 'CURRENTOP_IGNORE_OP=["none"]' \
   -e 'CURRENTOP_IGNORE_FIELD=["lsid","waitingForFlowControl","flowControlStats","numYields","currentOpTime","clientMetadata","command.$clusterTime","locks","waitingForLock","lockStats","threadId"]' \
-  -e 'CURRENTOP_IGNORE_KEYVALUE=[{"command":"hello"},{"command":"currentOp"},{"command":"isMaster"},{"appName":"OplogFetcher"},{"ns":"admin"},{"ns":"local"},{"appName":"QAN"}]' \
+  -e 'CURRENTOP_IGNORE_KEYVALUE=[]' \
   -e 'CURRENTOP_INIT_LABEL=["command","opid","v","active","t","connectionId","desc","host","type","exporter_type","effectiveUsers","client","clientMetadata","secs_running","microsecs_running","waitingForLatch","appName","planSummary","cursor","preImageOpTime","writeConflicts","transaction","postImageOpTime","originatingCommand","query","fromMigrate"]' \
   --memory=1000m \
   --cpus=1 \

@@ -197,7 +197,7 @@
           "refId": "B"
         }
       ],
-      "title": "currentOp 当前正在执行的语句 排除admin,local,hello",
+      "title": "currentOp 当前正在执行的语句（可配置排除 admin/local/hello）",
       "transformations": [
         {
           "id": "organize",

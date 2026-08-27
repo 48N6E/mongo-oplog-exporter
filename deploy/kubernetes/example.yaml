@@ -60,8 +60,8 @@ spec:
           value: '["none"]'
         - name: CURRENTOP_IGNORE_FIELD  # strip locks, lockStats, etc.
           value: '["lsid","waitingForFlowControl","flowControlStats","numYields","currentOpTime","clientMetadata","command.$clusterTime","locks","waitingForLock","lockStats","threadId"]'
-        - name: CURRENTOP_IGNORE_KEYVALUE  # filter hello, replication, QAN noise
-          value: '[{"command":"hello"},{"command":"currentOp"},{"command":"isMaster"},{"appName":"OplogFetcher"},{"ns":"admin"},{"ns":"local"},{"appName":"QAN"}]'
+        - name: CURRENTOP_IGNORE_KEYVALUE  # default []; tip: filter hello / admin.$cmd / local in production
+          value: '[]'
         - name: OPENLOG_CURRENTOP    # debug: print currentOp JSON (keep false)
           value: "false"
         - name: CURRENTOP_METRICS_TYPE

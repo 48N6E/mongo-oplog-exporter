@@ -70,7 +70,8 @@ spec:
         - name: CURRENTOP_METRICS_NAME
           value: "log_to_metric_mongo_currentop"
         - name: CURRENTOP_IGNORE_KEYVALUE
-          value: '[{"command":"hello"},{"command":"currentOp"},{"command":"isMaster"},{"appName":"OplogFetcher"},{"ns":"admin"},{"ns":"local"},{"appName":"QAN"}]'
+          # default []; tip: set recommended filters in production (hello, admin.$cmd, local, …)
+          value: '[]'
         - name: CURRENTOP_INTERVAL
           value: "20000"
 

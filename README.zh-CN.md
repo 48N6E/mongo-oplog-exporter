@@ -83,18 +83,24 @@ npm install && npm start
 
 环境变量优先级高于 `config.json`。完整变量表见 [English README — Configuration](README.md#configuration)。
 
-### 默认过滤：`admin.$cmd` 与系统噪声
+### 提示：生产环境建议过滤系统噪声
 
-| 数据源 | 是否默认忽略 `admin.$cmd` | 说明 |
-|--------|--------------------------|------|
-| **currentOp** | **是** | `CURRENTOP_IGNORE_KEYVALUE` 含 `{"ns":"admin"}`，对 `ns` 做**子串匹配**，故 `admin.$cmd` 等 `admin.*` 不会进入 `log_to_metric_mongo_currentop` |
-| **oplog** | **否** | 仅忽略 `op=n`；`local.oplog.rs` 里若有 `ns=admin.$cmd` 仍会进入 `log_to_metric_mongo_oplog` |
+**默认：** `CURRENTOP_IGNORE_KEYVALUE=[]` — **会采集** `admin.$cmd`、`hello`、`local.*` 等系统操作。配置过滤后，`ns` 等字段按**子串**匹配（例如 `{"ns":"admin"}` 也会匹配 `admin.$cmd`）。
 
-若需在 currentOp 中**采集** `admin` / `admin.$cmd`，从 `CURRENTOP_IGNORE_KEYVALUE` 中去掉 `{"ns":"admin"}` 即可，例如：
+**建议：** 高流量集群请自行配置过滤，降低心跳 / 复制 / 系统库噪声与 Prometheus 基数：
 
 ```bash
-CURRENTOP_IGNORE_KEYVALUE=[{"command":"hello"},{"command":"currentOp"},{"command":"isMaster"},{"appName":"OplogFetcher"},{"ns":"local"},{"appName":"QAN"}]
+CURRENTOP_IGNORE_KEYVALUE=[{"command":"hello"},{"command":"currentOp"},{"command":"isMaster"},{"appName":"OplogFetcher"},{"ns":"admin"},{"ns":"local"},{"appName":"QAN"}]
 ```
+
+| 条件 | 原因 |
+|------|------|
+| `{"command":"hello"}` / `{"command":"isMaster"}` | 驱动心跳 / 拓扑探测 |
+| `{"command":"currentOp"}` | exporter 自身轮询 |
+| `{"appName":"OplogFetcher"}` / `{"appName":"QAN"}` | 复制拉 oplog / QAN |
+| `{"ns":"admin"}` / `{"ns":"local"}` | 系统库操作（含 `admin.$cmd`） |
+
+**oplog** 默认仍只忽略 `op=n`（不按 `ns` 过滤）。
 
 详见 [docs/KUBERNETES.zh-CN.md — CURRENTOP_IGNORE_KEYVALUE](docs/KUBERNETES.zh-CN.md#currentop_ignore_keyvalue-过滤规则)。
 
