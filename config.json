@@ -14,12 +14,12 @@
     "ignoreOp": ["n"],
     "ignoreField": ["lsid", "ui", "prevOpTime", "stmtId", "ts", "txnNumber", "wall", "o2", "o", "postImageOpTime", "h", "fromMigrate"],
     "metricsType": "counter",
-    "counterInitLabel": ["op", "ns", "node_name", "service_name", "t", "cluster", "v", "o2"],
+    "counterInitLabel": ["op", "ns", "node_name", "service_name", "t", "cluster", "v", "o2", "lsid", "ui", "prevOpTime", "stmtId", "ts", "txnNumber", "wall", "preImageOpTime", "writeConflicts", "transaction", "fromMigrate"],
     "metricsName": "log_to_metric_mongo_oplog",
     "valueLength": 1000
   },
   "currentOp": {
-    "isOpen": "false",
+    "isOpen": "true",
     "interval": 20000,
     "ignoreOp": ["none"],
     "ignoreField": ["lsid", "waitingForFlowControl", "flowControlStats", "numYields", "currentOpTime", "clientMetadata", "command.$clusterTime", "locks", "waitingForLock", "lockStats", "threadId"],
@@ -33,7 +33,7 @@
       {"appName": "QAN"}
     ],
     "metricsType": "counter",
-    "counterInitLabel": ["command", "op", "ns", "client", "exporter_type"],
+    "counterInitLabel": ["command", "opid", "v", "active", "t", "connectionId", "desc", "host", "type", "exporter_type", "effectiveUsers", "client", "clientMetadata", "secs_running", "microsecs_running", "waitingForLatch", "appName", "planSummary", "cursor", "preImageOpTime", "writeConflicts", "transaction", "postImageOpTime", "originatingCommand", "query", "fromMigrate"],
     "metricsName": "log_to_metric_mongo_currentop",
     "valueLength": 1000
   }
