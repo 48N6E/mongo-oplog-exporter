@@ -83,6 +83,21 @@ npm install && npm start
 
 环境变量优先级高于 `config.json`。完整变量表见 [English README — Configuration](README.md#configuration)。
 
+### 默认过滤：`admin.$cmd` 与系统噪声
+
+| 数据源 | 是否默认忽略 `admin.$cmd` | 说明 |
+|--------|--------------------------|------|
+| **currentOp** | **是** | `CURRENTOP_IGNORE_KEYVALUE` 含 `{"ns":"admin"}`，对 `ns` 做**子串匹配**，故 `admin.$cmd` 等 `admin.*` 不会进入 `log_to_metric_mongo_currentop` |
+| **oplog** | **否** | 仅忽略 `op=n`；`local.oplog.rs` 里若有 `ns=admin.$cmd` 仍会进入 `log_to_metric_mongo_oplog` |
+
+若需在 currentOp 中**采集** `admin` / `admin.$cmd`，从 `CURRENTOP_IGNORE_KEYVALUE` 中去掉 `{"ns":"admin"}` 即可，例如：
+
+```bash
+CURRENTOP_IGNORE_KEYVALUE=[{"command":"hello"},{"command":"currentOp"},{"command":"isMaster"},{"appName":"OplogFetcher"},{"ns":"local"},{"appName":"QAN"}]
+```
+
+详见 [docs/KUBERNETES.zh-CN.md — CURRENTOP_IGNORE_KEYVALUE](docs/KUBERNETES.zh-CN.md#currentop_ignore_keyvalue-过滤规则)。
+
 ## License
 
 [GPL-3.0](LICENSE)

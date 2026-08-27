@@ -40,6 +40,10 @@ TOP5 慢查询明细，以及全表扫描 / 非全表扫描慢查询时序图。
 
 慢查询相关面板依赖独立的慢日志指标；若环境中未部署对应采集器，可删除或禁用「慢查询」分组下的面板。
 
+## 与 exporter 默认过滤一致
+
+currentOp 表格标题中的「排除 admin, local, hello」与 exporter 默认 `CURRENTOP_IGNORE_KEYVALUE` 一致：**`admin.$cmd`** 等 `admin.*` 不会出现在 currentOp 指标中（`ns` 子串匹配 `admin`）。oplog 面板不受此规则影响。说明见 [README — admin.$cmd](../../README.md#default-filtering-admincmd-and-system-noise)（中文：[README.zh-CN](../../README.zh-CN.md#默认过滤admincmd-与系统噪声)）。
+
 ## 隐私说明
 
 面板 JSON 与截图均已脱敏：不含真实 MongoDB 实例名、内网 IP、密码或日志平台 ID。导入后变量由当前环境的 Prometheus 动态填充；`LogUrl` / `LogIndex` 默认为空，按需自行配置。

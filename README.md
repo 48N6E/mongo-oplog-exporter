@@ -239,6 +239,20 @@ Production deployments should inject all settings via env vars.
 | `CURRENTOP_INIT_LABEL` | Pre-declared counter labels |
 | `CURRENTOP_VALUE_LENGTH` | Max label value length |
 
+### Default filtering: `admin.$cmd` and system noise
+
+**currentOp** (default): `CURRENTOP_IGNORE_KEYVALUE` includes `{"ns":"admin"}`. Matching uses **substring** on the `ns` label, so **`admin.$cmd`** and other `admin.*` namespaces are **not exported** to `log_to_metric_mongo_currentop`. This reduces noise from internal commands (`hello`, replication, etc. are filtered separately). **`local`** is filtered the same way.
+
+**oplog** (default): only `OPLOG_IGNORE_OP=["n"]` — **no** `ns` filter. Writes to `admin.$cmd` still appear in `log_to_metric_mongo_oplog` if present in `local.oplog.rs`.
+
+To **include** `admin` / `admin.$cmd` in currentOp metrics, remove `{"ns":"admin"}` from `CURRENTOP_IGNORE_KEYVALUE`, for example:
+
+```bash
+-e 'CURRENTOP_IGNORE_KEYVALUE=[{"command":"hello"},{"command":"currentOp"},{"command":"isMaster"},{"appName":"OplogFetcher"},{"ns":"local"},{"appName":"QAN"}]'
+```
+
+See [docs/KUBERNETES.md](docs/KUBERNETES.md) for the full filter table.
+
 See [`config.example.json`](config.example.json) and [`.env.example`](.env.example).
 
 ## Prometheus

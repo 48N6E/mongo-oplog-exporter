@@ -224,7 +224,11 @@ currentOp `inprog[]` 中每条操作 → Prometheus label，用于 **`log_to_met
 | `{"command":"currentOp"}` | exporter 自身查询 |
 | `{"appName":"OplogFetcher"}` | 副本集复制拉 oplog |
 | `{"appName":"QAN"}` | Percona QAN 监控 |
-| `{"ns":"admin"}` / `{"ns":"local"}` | 系统库内部操作 |
+| `{"ns":"admin"}` / `{"ns":"local"}` | 系统库内部操作（含 `admin.$cmd`、`local.*`） |
+
+默认会过滤 `admin.$cmd`：规则为 `ns` 字段**包含** `"admin"` 即丢弃整条 currentOp（子串匹配，不是精确相等）。
+
+若需要监控 `admin.$cmd`，从 `CURRENTOP_IGNORE_KEYVALUE` 中删除 `{"ns":"admin"}`，保留其余项即可。oplog 侧无按 `ns` 过滤，见 [README — admin.$cmd 说明](../README.md#default-filtering-admincmd-and-system-noise)。
 
 ---
 

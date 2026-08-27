@@ -224,7 +224,9 @@ Each entry in currentOp `inprog[]` → labels on **`log_to_metric_mongo_currento
 | `{"command":"currentOp"}` | Exporter's own query |
 | `{"appName":"OplogFetcher"}` | Replica set oplog replication |
 | `{"appName":"QAN"}` | Percona QAN agent |
-| `{"ns":"admin"}` / `{"ns":"local"}` | System database internals |
+| `{"ns":"admin"}` / `{"ns":"local"}` | System database internals (`admin.$cmd`, `local.*`) |
+
+By default **`admin.$cmd` is excluded** from currentOp metrics: `{"ns":"admin"}` uses **substring** matching on the `ns` label (not exact equality). To include `admin` / `admin.$cmd`, remove `{"ns":"admin"}` from `CURRENTOP_IGNORE_KEYVALUE`. Oplog has no `ns` filter — see [README — admin.$cmd](../README.md#default-filtering-admincmd-and-system-noise).
 
 ---
 
