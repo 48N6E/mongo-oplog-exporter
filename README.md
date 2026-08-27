@@ -122,8 +122,7 @@ docker run -d \
 |-----|------|
 | `latest` | push to `main`, daily schedule |
 | `YYYY-MM-DD` | daily schedule |
-| `v1.0.0`, `1.0` | git tag `v*.*.*` |
-| `sha-<commit>` | push to `main` |
+| `1.0.0`, `1.0` | git tag `v*.*.*` (e.g. `v1.0.0`) |
 
 Manual run: **Actions → Docker Build and Push → Run workflow**.
 
