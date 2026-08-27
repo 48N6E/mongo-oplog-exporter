@@ -99,7 +99,7 @@ Metrics: `http://0.0.0.0:7777/metrics`
 
 ### Docker Hub (recommended)
 
-Images are published to [48n6e/mongo-oplog-exporter](https://hub.docker.com/r/48n6e/mongo-oplog-exporter), built daily and on every push to `main` via GitHub Actions.
+Images are published to [48n6e/mongo-oplog-exporter](https://hub.docker.com/r/48n6e/mongo-oplog-exporter), built on every push to `main` and on version tags via GitHub Actions.
 
 ```bash
 docker pull 48n6e/mongo-oplog-exporter:latest
@@ -120,8 +120,7 @@ docker run -d \
 
 | Tag | When |
 |-----|------|
-| `latest` | push to `main`, daily schedule |
-| `YYYY-MM-DD` | daily schedule |
+| `latest` | push to `main` |
 | `1.0.0`, `1.0` | git tag `v*.*.*` (e.g. `v1.0.0`) |
 
 Manual run: **Actions → Docker Build and Push → Run workflow**.
