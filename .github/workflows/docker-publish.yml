@@ -32,7 +32,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: 48n6e/mongo-oplog-exporter
+          images: ${{ secrets.DOCKERHUB_USERNAME }}/mongo-oplog-exporter
           tags: |
             type=raw,value=latest,enable={{is_default_branch}}
             type=semver,pattern={{version}}

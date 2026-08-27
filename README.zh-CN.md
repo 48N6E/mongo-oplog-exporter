@@ -6,10 +6,6 @@ Prometheus exporter：采集 MongoDB **oplog** 与 **currentOp**，暴露为 Pro
 
 [![License: GPL-3.0](https://img.shields.io/badge/License-GPL--3.0-blue.svg)](LICENSE)
 
-- **仓库**: [github.com/48N6E/mongo-oplog-exporter](https://github.com/48N6E/mongo-oplog-exporter)
-- **Docker Hub**: [48n6e/mongo-oplog-exporter](https://hub.docker.com/r/48n6e/mongo-oplog-exporter)
-- **作者**: [@48N6E](https://github.com/48N6E)
-
 ## 功能
 
 - **Oplog 采集**：对 `local.oplog.rs` 做 tailable cursor 流式监听
@@ -17,11 +13,6 @@ Prometheus exporter：采集 MongoDB **oplog** 与 **currentOp**，暴露为 Pro
 - **Prometheus 暴露**：`GET /metrics` 供 Prometheus 抓取
 - **灵活过滤**：通过环境变量忽略 op、字段、键值对
 - **多种部署**：Docker / Docker Compose / Kubernetes 示例
-- **Docker Hub**：每日 CI 构建 → [48n6e/mongo-oplog-exporter](https://hub.docker.com/r/48n6e/mongo-oplog-exporter)
-
-```bash
-docker pull 48n6e/mongo-oplog-exporter:latest
-```
 
 ## 解决什么问题？
 

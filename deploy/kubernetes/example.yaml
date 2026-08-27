@@ -24,7 +24,7 @@ spec:
       # ...
 
     - name: mongo-oplog-exporter
-      image: 48n6e/mongo-oplog-exporter:latest
+      image: mongo-oplog-exporter:latest
       env:
         # ── Core ──────────────────────────────────────────────
         - name: OPEN_OPLOG          # enable oplog tailing

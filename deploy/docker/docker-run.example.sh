@@ -7,7 +7,7 @@
 
 set -e
 
-IMAGE="${IMAGE:-48n6e/mongo-oplog-exporter:latest}"
+IMAGE="${IMAGE:-mongo-oplog-exporter:latest}"
 MONGO_URL="${MONGO_URL:?Set MONGO_URL}"
 PORT="${PORT:-7777}"
 

@@ -1,7 +1,7 @@
 # Publish mongo-oplog-exporter to GitHub (run in a terminal where `gh auth status` succeeds)
 #
 # Usage:
-#   cd d:\code\cursorcode\mongo-oplog-exporter
+#   cd path\to\mongo-oplog-exporter
 #   .\scripts\publish-github.ps1
 
 $ErrorActionPreference = "Stop"
@@ -13,12 +13,15 @@ if ($LASTEXITCODE -ne 0) {
     Write-Error "Run 'gh auth login' first and complete the browser flow."
 }
 
-if (gh repo view "48N6E/mongo-oplog-exporter" 2>$null) {
+$repoName = "mongo-oplog-exporter"
+$remoteUrl = git remote get-url origin 2>$null
+
+if ($remoteUrl -and (gh repo view 2>$null)) {
     Write-Host "Repository exists. Pushing..."
     git push -u origin main
 } else {
     Write-Host "Creating public repository and pushing..."
-    gh repo create mongo-oplog-exporter --public --source=. --remote=origin --push
+    gh repo create $repoName --public --source=. --remote=origin --push
 }
 
-Write-Host "Done: https://github.com/48N6E/mongo-oplog-exporter"
+Write-Host "Done."

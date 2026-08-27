@@ -2,12 +2,10 @@
 
 [![License: GPL-3.0](https://img.shields.io/badge/License-GPL--3.0-blue.svg)](LICENSE)
 [![Node.js](https://img.shields.io/badge/node-%3E%3D18-brightgreen.svg)](package.json)
-[![Docker](https://github.com/48N6E/mongo-oplog-exporter/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/48N6E/mongo-oplog-exporter/actions/workflows/docker-publish.yml)
-[![Docker Hub](https://img.shields.io/badge/Docker%20Hub-48n6e%2Fmongo--oplog--exporter-blue)](https://hub.docker.com/r/48n6e/mongo-oplog-exporter)
 
 Prometheus exporter that tails MongoDB **oplog** and polls **currentOp**, exposing operations as Prometheus metrics.
 
-[中文文档](README.zh-CN.md) · [Repository](https://github.com/48N6E/mongo-oplog-exporter) · [Docker Hub](https://hub.docker.com/r/48n6e/mongo-oplog-exporter) · [Author @48N6E](https://github.com/48N6E)
+[中文文档](README.zh-CN.md)
 
 ## Features
 
@@ -97,35 +95,7 @@ Metrics: `http://0.0.0.0:7777/metrics`
 
 ## Deployment
 
-### Docker Hub (recommended)
-
-Images are published to [48n6e/mongo-oplog-exporter](https://hub.docker.com/r/48n6e/mongo-oplog-exporter), built on every push to `main` and on version tags via GitHub Actions.
-
-```bash
-docker pull 48n6e/mongo-oplog-exporter:latest
-
-docker run -d \
-  --name mongo-oplog-exporter \
-  -p 7777:7777 \
-  -e MONGO_URL="mongodb://exporter:change-me@host:27017/?authSource=admin" \
-  48n6e/mongo-oplog-exporter:latest
-```
-
-**Maintainer setup** — add these [GitHub repository secrets](https://github.com/48N6E/mongo-oplog-exporter/settings/secrets/actions):
-
-| Secret | Value |
-|--------|-------|
-| `DOCKERHUB_USERNAME` | `48n6e` |
-| `DOCKERHUB_TOKEN` | Docker Hub [access token](https://hub.docker.com/settings/security) |
-
-| Tag | When |
-|-----|------|
-| `latest` | push to `main` |
-| `1.0.0`, `1.0` | git tag `v*.*.*` (e.g. `v1.0.0`) |
-
-Manual run: **Actions → Docker Build and Push → Run workflow**.
-
-### Docker Run (build locally)
+### Docker Run
 
 ```bash
 docker build -t mongo-oplog-exporter:latest .
@@ -181,7 +151,7 @@ Typical pattern: run the exporter as a **sidecar** per MongoDB pod, with per-nod
 
 ```yaml
 - name: mongo-oplog-exporter
-  image: 48n6e/mongo-oplog-exporter:latest
+  image: mongo-oplog-exporter:latest
   env:
     - name: MONGO_URL
       valueFrom:
