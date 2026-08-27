@@ -1,6 +1,6 @@
 {
   "name": "mongo-oplog-exporter",
-  "version": "1.0.3",
+  "version": "1.0.2",
   "description": "Prometheus exporter for MongoDB oplog and currentOp metrics",
   "main": "app.js",
   "scripts": {
