@@ -1,0 +1,21 @@
+services:
+  mongo-oplog-exporter:
+    image: 48n6e/mongo-oplog-exporter:latest
+    build: .
+    container_name: mongo-oplog-exporter
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "${PORT:-7777}:${PORT:-7777}"
+    command:
+      - node
+      - --trace-warnings
+      - --gc-interval=1000
+      - --max-old-space-size=2048
+      - app.js
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1000M

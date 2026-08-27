@@ -1,0 +1,89 @@
+# Example: one exporter sidecar per MongoDB node
+# Field reference: docs/KUBERNETES.zh-CN.md
+#
+# Before deploy, create the exporter user on MongoDB (admin database):
+#   db.createUser({
+#     user: "exporter",
+#     pwd: "<password>",
+#     roles: [
+#       { role: "clusterMonitor", db: "admin" },
+#       { role: "read", db: "local" }
+#     ]
+#   })
+# MONGO_URL example: mongodb://exporter:<password>@127.0.0.1:27017/?authSource=admin
+#
+# Use a Secret for MONGO_URL in production — do not commit passwords
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mongodb-with-oplog-exporter
+spec:
+  containers:
+    - name: mongodb
+      image: mongo:7
+      # ...
+
+    - name: mongo-oplog-exporter
+      image: 48n6e/mongo-oplog-exporter:latest
+      env:
+        # ── Core ──────────────────────────────────────────────
+        - name: OPEN_OPLOG          # enable oplog tailing
+          value: "true"
+        - name: OPEN_CURRENTOP      # enable currentOp polling
+          value: "true"
+        - name: PORT                # /metrics HTTP port (5000, 5001, ... per node)
+          value: "5000"
+        - name: MONGO_URL           # MongoDB URI (use Secret in production)
+          valueFrom:
+            secretKeyRef:
+              name: mongodb-exporter
+              key: mongo-url
+
+        # ── Oplog ─────────────────────────────────────────────
+        - name: OPLOG_IGNORE_OP     # ignore no-op heartbeats ["n"]
+          value: '["n"]'
+        - name: OPLOG_IGNORE_FIELD  # strip large/noisy fields before labeling
+          value: '["lsid","ui","prevOpTime","stmtId","ts","txnNumber","wall","o2","o","postImageOpTime","h","fromMigrate"]'
+        - name: OPENLOG_OPLOG       # debug: print each oplog doc (keep false)
+          value: "false"
+        - name: OPLOG_METRICS_TYPE  # counter | gauge
+          value: "counter"
+        - name: OPLOG_INIT_LABEL    # oplog fields → Prometheus labels (see docs)
+          value: '["op","ns","node_name","service_name","t","cluster","v","o2","lsid","ui","prevOpTime","stmtId","ts","txnNumber","wall","preImageOpTime","writeConflicts","transaction","fromMigrate"]'
+        - name: OPLOG_METRICS_NAME
+          value: "log_to_metric_mongo_oplog"
+
+        # ── CurrentOp (slow query / active statements) ────────
+        - name: CURRENTOP_INTERVAL   # poll every 20 seconds (ms)
+          value: "20000"
+        - name: CURRENTOP_IGNORE_OP
+          value: '["none"]'
+        - name: CURRENTOP_IGNORE_FIELD  # strip locks, lockStats, etc.
+          value: '["lsid","waitingForFlowControl","flowControlStats","numYields","currentOpTime","clientMetadata","command.$clusterTime","locks","waitingForLock","lockStats","threadId"]'
+        - name: CURRENTOP_IGNORE_KEYVALUE  # filter hello, replication, QAN noise
+          value: '[{"command":"hello"},{"command":"currentOp"},{"command":"isMaster"},{"appName":"OplogFetcher"},{"ns":"admin"},{"ns":"local"},{"appName":"QAN"}]'
+        - name: OPENLOG_CURRENTOP    # debug: print currentOp JSON (keep false)
+          value: "false"
+        - name: CURRENTOP_METRICS_TYPE
+          value: "counter"
+        - name: CURRENTOP_INIT_LABEL # key labels: secs_running, command, query, planSummary, ns, client, appName
+          value: '["command","opid","v","active","t","connectionId","desc","host","type","exporter_type","effectiveUsers","client","clientMetadata","secs_running","microsecs_running","waitingForLatch","appName","planSummary","cursor","preImageOpTime","writeConflicts","transaction","postImageOpTime","originatingCommand","query","fromMigrate"]'
+        - name: CURRENTOP_METRICS_NAME
+          value: "log_to_metric_mongo_currentop"
+
+      command:
+        - node
+        - --trace-warnings
+        - --gc-interval=1000
+        - --max-old-space-size=2048
+        - /home/app.js
+      ports:
+        - containerPort: 5000
+          name: metrics
+      resources:
+        limits:
+          cpu: "1"
+          memory: "1000Mi"
+        requests:
+          cpu: "100m"
+          memory: "256Mi"

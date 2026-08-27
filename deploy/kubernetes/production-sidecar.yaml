@@ -1,0 +1,90 @@
+# Production sidecar — based on real MongoDB cluster deployment
+# One exporter per MongoDB Pod; PORT increments per node (5000, 5001, ...)
+#
+# Helm / templating example:
+#   container name: mongodb-oplog-exporter-{{ $index }}
+#   PORT:           500{{ $index }}
+#   MONGO_URL:      mongodb://exporter:<password>@{{ $value }}/?authSource=admin
+#
+# Prerequisites:
+#   1. Create exporter user (see README)
+#   2. Create Secret: kubectl apply -f secret.example.yaml
+#   3. Prometheus scrape each sidecar port
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mongodb-node-0-with-exporter
+  labels:
+    app: mongodb
+spec:
+  containers:
+    - name: mongodb
+      image: mongo:7
+      # ... mongod container spec ...
+
+    - name: mongodb-oplog-exporter-0
+      image: 48n6e/mongo-oplog-exporter:latest
+      ports:
+        - name: metrics
+          containerPort: 5000
+      env:
+        # ── Core ──────────────────────────────────────────
+        - name: OPEN_OPLOG
+          value: "true"
+        - name: OPEN_CURRENTOP
+          value: "true"
+        - name: PORT
+          value: "5000"
+        - name: MONGO_URL
+          valueFrom:
+            secretKeyRef:
+              name: mongodb-exporter
+              key: mongo-url
+
+        # ── Oplog ─────────────────────────────────────────
+        - name: OPLOG_IGNORE_OP
+          value: '["n"]'
+        - name: OPLOG_IGNORE_FIELD
+          value: '["lsid","ui","prevOpTime","stmtId","ts","txnNumber","wall","o2","o","postImageOpTime","h","fromMigrate"]'
+        - name: OPENLOG_OPLOG
+          value: "false"
+        - name: OPLOG_METRICS_TYPE
+          value: "counter"
+        - name: OPLOG_INIT_LABEL
+          value: '["op","ns","node_name","service_name","t","cluster","v","o2","lsid","ui","prevOpTime","stmtId","ts","txnNumber","wall","preImageOpTime","writeConflicts","transaction","fromMigrate"]'
+        - name: OPLOG_METRICS_NAME
+          value: "log_to_metric_mongo_oplog"
+
+        # ── CurrentOp ─────────────────────────────────────
+        - name: CURRENTOP_IGNORE_OP
+          value: '["none"]'
+        - name: CURRENTOP_IGNORE_FIELD
+          value: '["lsid","waitingForFlowControl","flowControlStats","numYields","currentOpTime","clientMetadata","command.$clusterTime","locks","waitingForLock","lockStats","threadId"]'
+        - name: OPENLOG_CURRENTOP
+          value: "false"
+        - name: CURRENTOP_METRICS_TYPE
+          value: "counter"
+        - name: CURRENTOP_INIT_LABEL
+          value: '["command","opid","v","active","t","connectionId","desc","host","type","exporter_type","effectiveUsers","client","clientMetadata","secs_running","microsecs_running","waitingForLatch","appName","planSummary","cursor","preImageOpTime","writeConflicts","transaction","postImageOpTime","originatingCommand","query","fromMigrate"]'
+        - name: CURRENTOP_METRICS_NAME
+          value: "log_to_metric_mongo_currentop"
+        - name: CURRENTOP_IGNORE_KEYVALUE
+          value: '[{"command":"hello"},{"command":"currentOp"},{"command":"isMaster"},{"appName":"OplogFetcher"},{"ns":"admin"},{"ns":"local"},{"appName":"QAN"}]'
+        - name: CURRENTOP_INTERVAL
+          value: "20000"
+
+      command:
+        - node
+        - --trace-warnings
+        - --gc-interval=1000
+        - --max-old-space-size=2048
+        - /home/app.js
+
+      resources:
+        limits:
+          cpu: "1"
+          memory: "1000Mi"
+        requests:
+          cpu: "100m"
+          memory: "256Mi"

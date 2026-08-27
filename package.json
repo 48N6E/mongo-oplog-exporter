@@ -1,0 +1,36 @@
+{
+  "name": "mongo-oplog-exporter",
+  "version": "1.0.0",
+  "description": "Prometheus exporter for MongoDB oplog and currentOp metrics",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/48N6E/mongo-oplog-exporter.git"
+  },
+  "bugs": {
+    "url": "https://github.com/48N6E/mongo-oplog-exporter/issues"
+  },
+  "homepage": "https://github.com/48N6E/mongo-oplog-exporter#readme",
+  "author": "48N6E (https://github.com/48N6E)",
+  "keywords": [
+    "mongodb",
+    "oplog",
+    "currentop",
+    "prometheus",
+    "exporter",
+    "metrics"
+  ],
+  "license": "GPL-3.0-or-later",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "express": "^4.21.1",
+    "lodash": "^4.17.21",
+    "mongodb": "^6.6.0",
+    "prom-client": "^15.1.3"
+  }
+}

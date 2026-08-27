@@ -1,0 +1,40 @@
+{
+  "httpServer": {
+    "port": 7777
+  },
+  "log": {
+    "openOplog": "false",
+    "openCurrentOp": "false"
+  },
+  "mongoUrl": "mongodb://localhost:27017",
+  "directConnection": "true",
+  "rateLimit": 10000,
+  "oplog": {
+    "isOpen": "true",
+    "ignoreOp": ["n"],
+    "ignoreField": ["lsid", "ui", "prevOpTime", "stmtId", "ts", "txnNumber", "wall", "o2", "o", "postImageOpTime", "h", "fromMigrate"],
+    "metricsType": "counter",
+    "counterInitLabel": ["op", "ns", "node_name", "service_name", "t", "cluster", "v", "o2"],
+    "metricsName": "log_to_metric_mongo_oplog",
+    "valueLength": 1000
+  },
+  "currentOp": {
+    "isOpen": "false",
+    "interval": 20000,
+    "ignoreOp": ["none"],
+    "ignoreField": ["lsid", "waitingForFlowControl", "flowControlStats", "numYields", "currentOpTime", "clientMetadata", "command.$clusterTime", "locks", "waitingForLock", "lockStats", "threadId"],
+    "ignoreKeyValue": [
+      {"command": "hello"},
+      {"command": "currentOp"},
+      {"command": "isMaster"},
+      {"appName": "OplogFetcher"},
+      {"ns": "admin"},
+      {"ns": "local"},
+      {"appName": "QAN"}
+    ],
+    "metricsType": "counter",
+    "counterInitLabel": ["command", "op", "ns", "client", "exporter_type"],
+    "metricsName": "log_to_metric_mongo_currentop",
+    "valueLength": 1000
+  }
+}
